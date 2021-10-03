@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "pg-chart.fullname" . }}-statefulset
+
+spec:
+  serviceName: "{{ include "pg-chart.fullname" . }}"
+  replicas: {{ .Values.replicaCount }}
+
+  selector:
+    matchLabels:
+      app: {{ include "pg-chart.fullname" . }}
+  template:
+    metadata:
+      labels:
+        app: {{ include "pg-chart.fullname" . }}
+    spec:
+      containers:
+      - name: {{ .Chart.Name }}
+        image: {{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}
+        ports:
+        - containerPort: {{ .Values.service.port }}
+          protocol: TCP
+        env:
+        - name: POSTGRES_DB
+          valueFrom:
+              configMapKeyRef:
+                name: pg-config
+                key: postgres.db
+        - name: POSTGRES_USER
+          valueFrom:
+              configMapKeyRef:
+                name: pg-config
+                key: postgres.user
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+              secretKeyRef:
+                name: pg-secrets
+                key: postgres.password
+        volumeMounts:
+        - name: postgredb
+          mountPath: /var/lib/postgresql/data
+          subPath: postgres
+      volumes:
+        - name: postgredb
+          persistentVolumeClaim:
+            claimName: {{ include "pg-chart.fullname" . }}-pv-claim

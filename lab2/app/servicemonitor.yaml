@@ -1,0 +1,19 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: crud-app
+  labels:
+    app: crud-app
+spec:
+  jobLabel: crud-app
+  namespaceSelector:
+    matchNames:
+    - "default"
+  selector:
+    matchLabels:
+      app:  crud-app
+  endpoints:
+  - interval: 10s
+  - targetPort: 8888
+  - port: metrics
+  - path: /actuator/prometheus

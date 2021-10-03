@@ -1,0 +1,29 @@
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: {{ include "pg-chart.fullname" . }}-pv-volume
+  labels:
+    type: local
+    app: {{ include "pg-chart.fullname" . }}
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteMany
+  hostPath:
+    path: "/opt/pg_data"
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: {{ include "pg-chart.fullname" . }}-pv-claim
+  labels:
+    app: {{ include "pg-chart.fullname" . }}
+spec:
+  storageClassName: manual
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 1Gi

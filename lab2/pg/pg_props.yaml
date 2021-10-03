@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: pg-config
+  namespace: default
+data:
+  postgres.db: mydb
+  postgres.user: myuser
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: pg-secrets
+type: Opaque
+data:
+  postgres.password: MTIzCg==

@@ -1,0 +1,46 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: init-db
+spec:
+  template:
+    metadata:
+      name: init-db
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: post-install-job
+        image: postgres:latest
+        env:
+          - name: POSTGRES_DB
+            valueFrom:
+                configMapKeyRef:
+                  name: pg-config
+                  key: postgres.db
+          - name: POSTGRES_USER
+            valueFrom:
+                configMapKeyRef:
+                  name: pg-config
+                  key: postgres.user
+          - name: POSTGRES_PASSWORD
+            valueFrom:
+                secretKeyRef:
+                  name: pg-secrets
+                  key: postgres.password
+        command:
+        - /bin/sh
+        - "-c"
+        - export PGPASSWORD=$(POSTGRES_PASSWORD)
+        - psql --host postgres --username $(POSTGRES_USER) --dbname $(POSTGRES_DB) <<'EOF'
+              CREATE TABLE public.users (
+                    id serial NOT NULL,
+                    "name" varchar NULL,
+                    CONSTRAINT users_pk PRIMARY KEY (id)
+                );
+              INSERT INTO public.users ("name")
+              VALUES('vasya');
+              INSERT INTO public.users ("name")
+              VALUES('petya');
+              commit;
+            EOF
+  backoffLimit: 0

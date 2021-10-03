@@ -1,0 +1,51 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: crud-app
+  labels:
+    app: crud-app
+spec:
+  type: NodePort
+  ports:
+   - port: 8888
+  selector:
+    app: crud-app
+
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: crud-app-statefulset
+spec:
+  serviceName: "crud-app"
+  replicas: 1
+  selector:
+    matchLabels:
+      app: crud-app
+  template:
+    metadata:
+      labels:
+        app: crud-app
+    spec:
+      containers:
+      - name: crud-app
+        image: psavchenko/otus-lab2-app:v1
+        ports:
+        - containerPort: 8888
+          name: crud-app
+        env:
+          - name: POSTGRES_DB
+            valueFrom:
+                configMapKeyRef:
+                  name: pg-config
+                  key: postgres.db
+          - name: POSTGRES_USER
+            valueFrom:
+                configMapKeyRef:
+                  name: pg-config
+                  key: postgres.user
+          - name: POSTGRES_PASSWORD
+            valueFrom:
+                secretKeyRef:
+                  name: pg-secrets
+                  key: postgres.password
