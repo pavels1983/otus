@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: lab1-app
+  labels:
+    app: lab1-app
+spec:
+  containers:
+  - name: lab1-app
+    image: psavchenko/otus-lab1:v1
+    ports:
+      - containerPort: 8000
+
