@@ -30,4 +30,5 @@ https://www.katacoda.com/schetinnikov/scenarios/prometheus-client
 Критерии оценки:
 "Принято" - задание выполнено полностью "Возвращено на доработку" - задание не выполнено полностью
 
+xxx
 
